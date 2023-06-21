@@ -7,16 +7,16 @@ from datetime import datetime
 from twilio.rest import Client
 import psycopg2
 import time
-
+import config
 while True:
   try:
 # Connect to Postgres database
     conn = psycopg2.connect(
-        host="database-1.cwc1bi2tp4j7.us-east-2.rds.amazonaws.com",
-        database="postgres",
-        user="postgres",
-        password="Manonthemoon123"
-    )
+    host=config.pg_host,
+    database=config.pg_database,
+    user=config.pg_user,
+    password=config.pg_password
+)
     cur = conn.cursor()
 
     # Create table if it doesn't exist
