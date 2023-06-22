@@ -24,16 +24,17 @@ while True:
     cur.execute("CREATE TABLE IF NOT EXISTS texted_watch_exchange_posts (id TEXT PRIMARY KEY, title TEXT, post_time TIMESTAMP, url TEXT, price FLOAT, brand TEXT)")
 
     # Set up Twilio
-    account_sid = 'ACd2079bd46f13974225b28ef06255af01'
-    auth_token = 'fc48aa972b023395d213c11a148238c1'
+    account_sid = config.twilio_account_sid
+    auth_token = config.twilio_auth_token
+    
     client = Client(account_sid, auth_token)
 
     # Set up Reddit
     user_agent = "Searchbot_01"
-    reddit = praw.Reddit(username="Searchbot_01",
-                        password ="aaaa1111",
-                        client_id="Ai32qfXNqvGuMEvHFFMlAw",
-                        client_secret="IG5XKjyUGkcG2cgXfBSwVvalMTxFRg",
+    reddit = praw.Reddit(username=config.reddit_username,
+                        password =config.reddit_password,
+                        client_id=config.reddit_client_id,
+                        client_secret=config.reddit_client_secret,
                         user_agent=user_agent,
                         check_for_async=False)
     subreddit = reddit.subreddit('watchexchange')
