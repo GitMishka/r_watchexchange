@@ -92,7 +92,7 @@ while True:
             if not texted_post:
                 message_body = f"Brand: {brand}\nTime: {post_time}\nLink: {url}"
                 message = client.messages.create(
-                    to='14232814382',
+                    to=config.twilio_to_number,
                     from_='18334633894',
                     body=message_body
                 )
