@@ -1,6 +1,3 @@
-
-
-
 import praw
 from tabulate import tabulate
 from datetime import datetime
@@ -10,7 +7,6 @@ import time
 import config
 while True:
   try:
-# Connect to Postgres database
     conn = psycopg2.connect(
     host=config.pg_host,
     database=config.pg_database,
@@ -19,17 +15,14 @@ while True:
 )
     cur = conn.cursor()
 
-    # Create table if it doesn't exist
     cur.execute("CREATE TABLE IF NOT EXISTS watch_exchange_posts (id TEXT PRIMARY KEY, title TEXT, post_time TIMESTAMP, url TEXT, price FLOAT, brand TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS texted_watch_exchange_posts (id TEXT PRIMARY KEY, title TEXT, post_time TIMESTAMP, url TEXT, price FLOAT, brand TEXT)")
 
-    # Set up Twilio
     account_sid = config.twilio_account_sid
     auth_token = config.twilio_auth_token
     
     client = Client(account_sid, auth_token)
 
-    # Set up Reddit
     user_agent = "Searchbot_01"
     reddit = praw.Reddit(username=config.reddit_username,
                         password =config.reddit_password,
@@ -40,7 +33,6 @@ while True:
     subreddit = reddit.subreddit('watchexchange')
     posts = subreddit.new(limit=10)
 
-    # Define search terms and brand list
     # Define search terms and brand list
     global search_terms
     search_terms = ['omega', 'sinn', 'rolex', 'seiko']
@@ -56,7 +48,6 @@ while True:
                     'Rolex', 'Seiko', 'Shinola', 'Sinn', 'Tag Heuer', 'Tissot', 'Tudor', 'Ulysse Nardin', 'Vacheron Constantin', 
                     'Victorinox Swiss Army', 'Zenith']
 
-    # Iterate through posts
     for post in posts:
         post_id = post.id
         post_name = post.title.lower()
@@ -73,19 +64,16 @@ while True:
                 brand = brand_name
                 break
         
-        # Check if post ID already exists in database
         cur.execute("SELECT id FROM watch_exchange_posts WHERE id=%s", (post_id,))
         existing_post = cur.fetchone()
         if existing_post:
             continue
         
-        # Insert new row into database
         cur.execute("INSERT INTO watch_exchange_posts (id, title, post_time, url, price, brand) VALUES (%s, %s, %s, %s, %s, %s)",
                     (post_id, post_name, post_time, url, price, brand))
         conn.commit()
         
         if any(term in post_name for term in search_terms):
-            # Check if post ID already exists in texted_watch_exchange_posts
             cur.execute("SELECT id FROM texted_watch_exchange_posts WHERE id=%s", (post_id,))
             texted_post = cur.fetchone()
             
@@ -96,16 +84,14 @@ while True:
                     from_='18334633894',
                     body=message_body
                 )
-                print(f"Message sent with ID: {message.sid}")
+                print(f"Message sent with ID:{message.sid}\nBody: {message_body}")
                 
-                # Insert new row into texted_watch_exchange_posts
                 cur.execute("INSERT INTO texted_watch_exchange_posts (id, title, post_time, url, price, brand) VALUES (%s, %s, %s, %s, %s, %s)",
                             (post_id, post_name, post_time, url, price, brand))
                 conn.commit()
             
   except Exception as e:
-        # handle any exceptions that may be raised
       print(f"An error occurred: {e}")
-  #print(message_body) 
-  time.sleep(10) # sleep for 10 seconds before running the loop again
 
+  #print(message_body) 
+  time.sleep(10) 
