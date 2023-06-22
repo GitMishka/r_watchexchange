@@ -72,6 +72,7 @@ while True:
         cur.execute("INSERT INTO watch_exchange_posts (id, title, post_time, url, price, brand) VALUES (%s, %s, %s, %s, %s, %s)",
                     (post_id, post_name, post_time, url, price, brand))
         conn.commit()
+        #print(f"New entry added to watch_exchange_posts: {post_id}, {post_name}, {post_time}, {url}, {price}, {brand}")
         
         if any(term in post_name for term in search_terms):
             cur.execute("SELECT id FROM texted_watch_exchange_posts WHERE id=%s", (post_id,))
@@ -89,7 +90,7 @@ while True:
                 cur.execute("INSERT INTO texted_watch_exchange_posts (id, title, post_time, url, price, brand) VALUES (%s, %s, %s, %s, %s, %s)",
                             (post_id, post_name, post_time, url, price, brand))
                 conn.commit()
-            
+                print(f"New entry added to texted_watch_exchange_posts: {post_id}, {post_name}, {post_time}, {url}, {price}, {brand}")
   except Exception as e:
       print(f"An error occurred: {e}")
 
