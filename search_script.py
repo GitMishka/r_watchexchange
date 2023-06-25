@@ -35,8 +35,8 @@ while True:
     posts = subreddit.new(limit=10)
 
     # Define search terms and keyterm list
-    
-    search_terms = ['omega', 'sinn', 'rolex', 'seiko']
+    cur.execute("SELECT term FROM search_terms WHERE subreddit = %s", (str(subreddit),))
+    search_terms = [item[0] for item in cur.fetchall()]
 
     keyterm_list = ['A. Lange & Sohne', 'Alpina', 'Armani Exchange', 'Audemars Piguet', 
                     'Ball', 'Baume et Mercier', 'Bell & Ross', 'Blancpain', 'Breguet', 'Breitling', 
@@ -73,7 +73,6 @@ while True:
         cur.execute("INSERT INTO watch_exchange_posts (id, title, post_time, url, price, keyterm) VALUES (%s, %s, %s, %s, %s, %s)",
                     (post_id, post_name, post_time, url, price, keyterm))
         conn.commit()
-        #print(f"New entry added to watch_exchange_posts: {post_id}, {post_name}, {post_time}, {url}, {price}, {keyterm}")
         
         if any(term in post_name for term in search_terms):
             cur.execute("SELECT id FROM search_texted WHERE id=%s", (post_id,))
@@ -86,14 +85,13 @@ while True:
                     from_='18334633894',
                     body=message_body
                 )
-                print(f"Message sent with ID:{message.sid}\nBody: {message_body}")
                 
                 cur.execute("INSERT INTO search_texted (id, title, post_time, url, price, keyterm) VALUES (%s, %s, %s, %s, %s, %s)",
                             (post_id, post_name, post_time, url, price, keyterm))
                 conn.commit()
-                print(f"New entry added to search_texted: {post_id}, {post_name}, {post_time}, {url}, {price}, {keyterm}")
   except Exception as e:
       print(f"An error occurred: {e}")
 
-  #print(message_body) 
-  time.sleep(10) 
+  time.sleep(10)
+
+
